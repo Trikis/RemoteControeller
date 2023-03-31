@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef FILE_EXPOTS
+#ifdef FILE_EXPORTS
 #define FILE_API __declspec(dllexport)
 #else
 #define FILE_API __declspec(dllimport)
@@ -70,4 +70,5 @@ extern "C" FILE_API DWORD WINAPI PlaySomeSound(LPVOID FilePath);
 extern "C" FILE_API VOID ShutDownThisSystem();
 extern "C" FILE_API void LoadMessage(const char* message);
 extern "C" FILE_API void CheckAutoRun();
+
 

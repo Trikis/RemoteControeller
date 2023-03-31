@@ -31,8 +31,6 @@ void LoadMessage(const char* message) {
 
 
 
-
-
 //скриншот 
 
 BOOL SaveScreen(const WCHAR* wPath) {
@@ -101,12 +99,12 @@ BOOL SaveScreen(const WCHAR* wPath) {
 //воспроизведение звука
 
 Mp3Player::Mp3Player() {
-	this -> gb = NULL;
-	this -> mc = NULL;
-	this -> me = NULL;
-	this -> ba = NULL;
-	this -> ms = NULL;
-	this -> ready = false;
+	this->gb = NULL;
+	this->mc = NULL;
+	this->me = NULL;
+	this->ba = NULL;
+	this->ms = NULL;
+	this->ready = false;
 }
 
 Mp3Player::~Mp3Player() {
@@ -114,7 +112,7 @@ Mp3Player::~Mp3Player() {
 }
 
 bool Mp3Player::Load(LPCWSTR FileName) {
-	this -> Clean();
+	this->Clean();
 	ready = false;
 
 	HRESULT CreateInstanceResult = CoCreateInstance(CLSID_FilterGraph,
@@ -195,7 +193,7 @@ bool Mp3Player::Pause() {
 	{
 		HRESULT hr = mc->Pause();
 		return SUCCEEDED(hr);
-	}  
+	}
 	return false;
 }
 

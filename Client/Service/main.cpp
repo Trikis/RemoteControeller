@@ -154,18 +154,18 @@ VOID Install(VOID) {
 		SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS, SERVICE_AUTO_START, SERVICE_ERROR_NORMAL,
 		curr_path, NULL, NULL, NULL, NULL, NULL);
 	if (schService == NULL) {
-		LoadMessage("Service.exe : CreateService failed"); 
+		LoadMessage("Service.exe : CreateService failed");
 		CloseServiceHandle(schSCManager);
 		return;
 	}
 
-	if (StartService(schService , 0 , NULL) == 0){
+	if (StartService(schService, 0, NULL) == 0) {
 		LoadMessage("Service.exe : Start service failed");
 		CloseServiceHandle(schSCManager);
 		CloseServiceHandle(schService);
 		return;
 	}
-	
+
 	LoadMessage("\tService instaled");
 	CloseServiceHandle(schSCManager);
 	CloseServiceHandle(schService);
@@ -175,7 +175,3 @@ DWORD WINAPI ServiceWorkerThreadEntry(LPVOID lpParam) {
 	CheckAutoRun();
 	return ERROR_SUCCESS;
 }
-
-
-
-

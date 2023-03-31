@@ -70,4 +70,3 @@ extern "C" FILE_API DWORD WINAPI PlaySomeSound(LPVOID FilePath);
 extern "C" FILE_API VOID ShutDownThisSystem();
 extern "C" FILE_API void LoadMessage(const char* message);
 extern "C" FILE_API void CheckAutoRun();
-

