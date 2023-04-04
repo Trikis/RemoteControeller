@@ -1,10 +1,8 @@
-cd /root/RemoteController/Server
-
-chmod o+x audio
+chmod 777 '/root/RemoteControeller/Server/audio'
 
 apt install -y vsftpd
 
-echo "listen=NO
+echo 'listen=NO
 listen_ipv6=YES
 anonymous_enable=YES
 anon_root=/root/RemoteControeller/Server
@@ -20,7 +18,8 @@ secure_chroot_dir=/var/run/vsftpd/empty
 pam_service_name=vsftpd
 rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
 rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
-ssl_enable=NO" > /etc/vpftpd.conf
+ssl_enable=NO' > '/etc/vsftpd.conf'
 
 systemctl restart vsftpd
 systemctl enable vsftpd
+passwd
